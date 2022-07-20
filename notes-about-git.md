@@ -1,11 +1,8 @@
-How to store the packages in git
-================================
+# How to store the packages in git
 
 Proposals about how to store the source package information in git.
 
-
-Traditional layout
-------------------
+## Traditional layout
 
 With this schema we do not make any change in the current way that we
 store the packages as currently done in OBS.
@@ -17,7 +14,8 @@ A new .obs/ directory will be present to store some package
 configuration or metadata file that will be required or used by OBS
 (for example, for the Meta XML)
 
-This layout is used in the obsgit[1] project, and can be used to
+This layout is used in the
+[obsgit project](https://github.com/openSUSE/obsgit), and can be used to
 transition to a real git model.
 
 The binaries can be stored using git-LFS[2], and there are simple
@@ -28,9 +26,7 @@ significant change in the workflow.  This makes it ideal as a first
 step to introduce git in OBS (as OBS would be still used to define
 projects, products, drive the review process and do the maintenance)
 
-
-Full git layout
----------------
+## Full git layout
 
 The git repository will store the source code directly.  When possible
 this will be a clone of the original upstream repository, but in other
@@ -42,7 +38,6 @@ In a nutshell, the full git layout will look as follows:
 
 From here, we have several choices that must be evaluated.  Some of
 them are enumerated here.
-
 
 ### Single master branch
 
@@ -82,7 +77,6 @@ should be something like:
 The hash in the URL is used in some package manager to specify a
 branch name.
 
-
 ### One branch per distribution
 
 As a linear extension of the previous layout, the developer can have
@@ -96,7 +90,6 @@ project where the package lives.
 In each branch we will have maybe different source codes, different
 spec files and the "meta.xml" will have different `<scmsync>` URLs for
 the different branches.
-
 
 ### One branch for the code, multiple for distribution
 
@@ -121,9 +114,8 @@ contain this line:
 <scmsync>ssh://git@code.opensuse.org:pool/package.git@v1.0-openSUSE</scmsync>
 ```
 
-I am using "@" to differentiate branches from tags, but if the norm is
+I am using "@@" to differentiate branches from tags, but if the norm is
 to use "#", should be used this instead.
-
 
 ### Other layouts
 
@@ -148,9 +140,7 @@ different concepts) that should be synchronized).
 But any other layout that put together the source code the rest of
 assets required to build a package, can be evaluated.
 
-
-Project layout
---------------
+# Project layout
 
 A project should be considered as a aggregation of packages and some
 metadata that set some OBS properties (like the project config).
@@ -192,9 +182,7 @@ Also, in the same way a new ".osc/" directory will be added to store
 the configuration files and metadata (like the project config) that
 belong to OBS.
 
-
-Use cases
-=========
+# Use cases
 
 Lets describe some use cases for those layouts, and see how is
 expected to work.
@@ -204,9 +192,7 @@ a very long time, as is the less disruptive one (also the less
 flexible).  Over the time (and in different stages) a full git layout
 should be deployed one user demand.
 
-
-User add / remove a package using the traditional layout
---------------------------------------------------------
+## User add / remove a package using the traditional layout
 
 In this scenario we will create a new package, but using the
 traditional layout (raw tarballs and package assets all together).  We
@@ -268,7 +254,7 @@ origin  git@code.opensuse.org:user/package.git (push)
 > git add .gitattributes package-1.0.0.tgz
 
 # Create the spec and change files
-> emacs package.spec package.changes
+> $EDITOR package.spec package.changes
 > git add *
 
 > git commit -a -m "Initial package"
@@ -293,9 +279,7 @@ Remove a package should be like:
 > git osc rdelete
 ```
 
-
-User works with a package using the traditional layout
-------------------------------------------------------
+## User works with a package using the traditional layout
 
 Daily work of an user in OBS, using the traditional layout (keeping
 tarballs, and delegating into OBS the review / release process as
@@ -365,9 +349,7 @@ with different `<package project="">` and different `<scmsync>`.
 To contributing back into the forked project we should do an `osc sr`
 under this model.
 
-
-User add / remove a package using the full layout
--------------------------------------------------
+## User add / remove a package using the full layout
 
 In this scenario we will create an empty git repo.  In the master /
 main branch we will have the pristine git clone (or unpacked tar ball)
@@ -422,9 +404,7 @@ package.c
 > git obs push
 ```
 
-
-User works with a package using the full layout
------------------------------------------------
+## User works with a package using the full layout
 
 In this scenario we have a package that is present in Tumbleweed and
 in SLE.
@@ -472,13 +452,13 @@ upstream        https://github.com/org/package.git (push)
 # in the upstream, so we want to update the code and add our patches
 # on top
 > git rebase upstream/main
-> emacs package.spec package.changes
+> $EDITOR package.spec package.changes
 > git commit --signoff -a -m "Update package"
 
 # Backport some fixes from upstrem in the SLE branch
 > git checkout SLE-15-SP4
 > git cherry-pick -x $SHA256
-> emacs package.spec package.changes
+> $EDITOR package.spec package.changes
 > git commit --signoff -a -m "Fix bad issue"
 > git push --force
 
@@ -618,9 +598,9 @@ branches[8], that point to any successfully build revision of the
 package (or successfully published revision of the package, to
 minimize the amount of those branches).  This branch will point to the
 history of this package, and so the git garbage collector will keep
-those commits during the package live cycle.
+those commits during the package life cycle.
 
-For example, if github is using branches like `refs/pull/XX/head`, OBS
+For example, if GitHub is using branches like `refs/pull/XX/head`, OBS
 can create branches like `refs/build/YY/head` to keep valid builds (or
 valid released builds) alive.
 
@@ -629,40 +609,27 @@ mangled spec file, where the release number (usually at 0) can be
 written in there, so the same package with the same old release number
 can be generated later on demand.
 
-
-
-User submit a maintenance update
---------------------------------
+## User submit a maintenance update
 
 TBD
 
-
-User share code with others
----------------------------
+## User share code with others
 
 TBD
 
-
-Re-using packages from other distributions
-------------------------------------------
+## Re-using packages from other distributions
 
 TDB
 
-
-User fix an embargoed CVE
--------------------------
+## User fix an embargoed CVE
 
 TBD
 
-
-Release manager updates Tumbleweed
-----------------------------------
+## Release manager updates Tumbleweed
 
 TBD
 
-
-Architecture
-============
+# Architecture
 
 TBD (OBS, git-obs, git service)
 
@@ -670,16 +637,13 @@ TBD (OBS, git-obs, git service)
 
 Done with diagrams.net[8]
 
+# References
 
-References
-==========
-
-[1] https://github.com/openSUSE/obsgit  
-[2] https://git-lfs.github.com/  
-[3] https://github.com/openSUSE/obsgit/blob/master/obsgit/obsgit.py#L716  
-[4] https://build.opensuse.org/package/meta/home:adrianSuSE:OBSGIT/git-example-2  
-[5] https://github.com/adrianschroeter/git-example-1  
-[6] https://github.com/adrianschroeter/git-example-3  
-[7] https://github.com/git-lfs/git-lfs/wiki/Tutorial#lfs-url
-[8] https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally
-[9] https://www.diagrams.net/
+[2] <https://git-lfs.github.com/>
+[3] <https://github.com/openSUSE/obsgit/blob/master/obsgit/obsgit.py#L716>
+[4] <https://build.opensuse.org/package/meta/home:adrianSuSE:OBSGIT/git-example-2>
+[5] <https://github.com/adrianschroeter/git-example-1>
+[6] <https://github.com/adrianschroeter/git-example-3>
+[7] <https://github.com/git-lfs/git-lfs/wiki/Tutorial#lfs-url>
+[8] <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/checking-out-pull-requests-locally>
+[9] <https://www.diagrams.net/>
